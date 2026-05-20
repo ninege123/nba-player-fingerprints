@@ -1,0 +1,27 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# R
+.Rhistory
+.RData
+.Ruserdata
+renv/library/
+renv/staging/
+
+# Data files
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.duckdb
+*.sqlite
+
+# Environment files
+.env
+
+# OS/editor
+.DS_Store
+.vscode/
