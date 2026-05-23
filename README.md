@@ -1,62 +1,52 @@
-\# NBA Player Fingerprints
+# NBA Player Fingerprints
 
+This project builds player-season fingerprints for NBA players using public basketball data. A fingerprint is a normalized feature vector that describes a player's role, position tendencies, and style of play.
 
+The goal is to compare players to position references, style archetypes, and other players using similarity analysis, outlier detection, and explainable visualizations.
 
-This project builds statistical fingerprints for NBA players using public basketball data.
+## Project Motivation
 
-
-
-The goal is to compare players to position and play-style archetypes using feature distributions, cosine similarity, and outlier detection.
-
-
-
-\## Project Motivation
-
-
-
-Traditional NBA analysis often focuses on box-score statistics or prediction tasks. This project instead focuses on player identity: what does a player's statistical profile look like, and which players or archetypes are most similar?
-
-
+Traditional NBA analysis often focuses on box-score totals or prediction tasks. This project focuses on player identity: what does a player's statistical profile look like, and which players or archetypes are most similar?
 
 The methodology is inspired by professional fingerprinting workflows used to compare behavioral patterns across peer groups.
 
+## Planned Methodology
 
+1. Pull public NBA player-season data.
+2. Build explicit player-level fingerprint features.
+3. Normalize features for profile comparison.
+4. Create reference fingerprints by position and manual archetype.
+5. Calculate cosine similarity between players and reference groups.
+6. Identify hybrid players, specialists, and outliers.
+7. Visualize player similarity and style clusters.
 
-\## Planned Methodology
+## Repository Structure
 
+- `src/nba_fingerprints/`: reusable Python package code.
+- `docs/`: project design, feature definitions, and data-source notes.
+- `notebooks/`: exploratory analysis and portfolio storytelling.
+- `R/`: optional R exploration, modeling, and visualization.
+- `data/raw/`: raw API outputs, gitignored.
+- `data/processed/`: processed feature tables, gitignored.
+- `data/sample/`: small test/sample files if needed.
+- `reports/`: generated analysis outputs and writeups.
+- `tests/`: automated checks for reusable Python logic.
 
+## Tools
 
-1\. Pull public NBA player data
+- Python
+- R
+- pandas
+- scikit-learn
+- nba_api
+- DuckDB, if useful later
+- Git/GitHub
 
-2\. Build player-level statistical fingerprints
+## Development
 
-3\. Create reference fingerprints by position and archetype
+Run the current Python checks with:
 
-4\. Calculate cosine similarity between players and reference groups
-
-5\. Identify hybrid players, specialists, and outliers
-
-6\. Visualize player similarity and style clusters
-
-
-
-\## Tools
-
-
-
-\- Python
-
-\- R
-
-\- SQL
-
-\- pandas
-
-\- scikit-learn
-
-\- tidyverse
-
-\- DuckDB
-
-\- Git/GitHub
+```powershell
+$env:PYTHONPATH="src"; .\.venv\Scripts\python.exe -m unittest discover
+```
 

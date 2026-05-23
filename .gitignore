@@ -14,6 +14,8 @@ renv/staging/
 # Data files
 data/raw/
 data/processed/
+outputs/
+reports/generated/
 *.csv
 *.parquet
 *.duckdb
