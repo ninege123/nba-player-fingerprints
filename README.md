@@ -8,7 +8,7 @@ The goal is to compare players to position references, style archetypes, and oth
 
 Traditional NBA analysis often focuses on box-score totals or prediction tasks. This project focuses on player identity: what does a player's statistical profile look like, and which players or archetypes are most similar?
 
-The methodology is inspired by professional fingerprinting workflows used to compare behavioral patterns across peer groups.
+The methodology is inspired by my professional fingerprinting workflows at work used to compare behavioral patterns across peer groups.
 
 ## Planned Methodology
 
