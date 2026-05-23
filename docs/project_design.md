@@ -18,8 +18,8 @@ Build player-season fingerprints for NBA players using public basketball data. A
 3. Clean and standardize identifiers, season labels, positions, and numeric stats.
 4. Engineer explicit fingerprint features from raw stats.
 5. Normalize fingerprint features so players can be compared on profile shape.
-6. Build reference fingerprints by position and manually defined archetype.
-7. Compute cosine similarity and nearest neighbors.
+6. Compute cosine similarity and nearest neighbors.
+7. Build reference fingerprints by position and manually defined archetype.
 8. Explain matches with feature-level differences and basketball-language summaries.
 
 ## Initial archetypes
@@ -41,3 +41,10 @@ Manual archetypes are the first pass because they are easier to explain. Cluster
 - Require minimum minutes or games played for reference fingerprints.
 - Compare obvious player examples against basketball intuition.
 - Track sensitivity to normalization choices.
+
+## Current implementation status
+
+- Player-season box-score totals can be loaded through `nba_api` and cached locally.
+- First-pass player-season features can be engineered from box-score totals.
+- Features can be min-max scaled into normalized fingerprint tables.
+- Player-to-player nearest neighbors can be scored with cosine similarity.

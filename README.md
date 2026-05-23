@@ -50,3 +50,19 @@ Run the current Python checks with:
 $env:PYTHONPATH="src"; .\.venv\Scripts\python.exe -m unittest discover
 ```
 
+Load one season of player stats from Python:
+
+```python
+from nba_fingerprints.data.nba_api_client import load_player_season_stats
+from nba_fingerprints.features.fingerprints import build_fingerprint_table
+from nba_fingerprints.features.player_season import build_player_season_features
+from nba_fingerprints.models.neighbors import find_nearest_neighbors
+
+players = load_player_season_stats("2023-24")
+features = build_player_season_features(players, season="2023-24", min_minutes=500)
+fingerprints = build_fingerprint_table(features)
+neighbors = find_nearest_neighbors(fingerprints, top_n=5)
+
+print(neighbors.head())
+```
+

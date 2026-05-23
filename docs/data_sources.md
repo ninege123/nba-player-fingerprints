@@ -6,8 +6,8 @@
 
 ## Planned tables
 
-- Player season traditional stats.
-- Player season advanced stats.
+- Player season traditional stats from `LeagueDashPlayerStats` with `measure_type="Base"` and `per_mode="Totals"`.
+- Player season advanced stats from the same endpoint with `measure_type="Advanced"`.
 - Player biographical or common info for position labels.
 
 ## Later sources
@@ -22,3 +22,7 @@
 - Processed feature tables belong in `data/processed/`.
 - Large raw and processed files are gitignored.
 - Small toy data for tests can live in `data/sample/`.
+
+## Current ingestion entry point
+
+Use `nba_fingerprints.data.nba_api_client.load_player_season_stats()` to load one player-season stat table. The function checks the local cache first and only calls the NBA Stats API when a cache file is absent or cache use is disabled.

@@ -5,7 +5,6 @@ This file defines the first-pass player-season fingerprint dimensions. The exact
 ## Role and volume
 
 - `minutes_per_game`: How large the player's role is.
-- `usage_rate`: Share of team possessions used while on the floor.
 - `points_per_36`: Scoring volume normalized to 36 minutes.
 
 ## Scoring and shooting
@@ -17,22 +16,29 @@ This file defines the first-pass player-season fingerprint dimensions. The exact
 
 ## Playmaking
 
-- `assist_rate`: Share of teammate field goals assisted while on the floor.
-- `turnover_rate`: Turnovers per possession estimate.
+- `assists_per_36`: Assist volume normalized to 36 minutes.
+- `turnovers_per_36`: Turnover volume normalized to 36 minutes.
 - `assist_to_turnover`: Passing creation relative to mistakes.
 
 ## Rebounding
 
-- `offensive_rebound_rate`: Offensive rebounding involvement.
-- `defensive_rebound_rate`: Defensive rebounding involvement.
-- `total_rebound_rate`: Overall rebounding involvement.
+- `offensive_rebounds_per_36`: Offensive rebounding involvement.
+- `defensive_rebounds_per_36`: Defensive rebounding involvement.
+- `rebounds_per_36`: Overall rebounding involvement.
 
 ## Defense proxies
 
-- `steal_rate`: Ball pressure and event creation proxy.
-- `block_rate`: Rim protection and shot-deterrence proxy.
+- `steals_per_36`: Ball pressure and event creation proxy.
+- `blocks_per_36`: Rim protection and shot-deterrence proxy.
 - `personal_fouls_per_36`: Defensive physicality or discipline proxy.
+
+## Later feature candidates
+
+- `usage_rate`: Share of team possessions used while on the floor.
+- `assist_rate`: Share of teammate field goals assisted while on the floor.
+- `turnover_rate`: Turnovers per possession estimate.
+- Position labels and play-type frequencies once reliable public sources are integrated.
 
 ## Normalization
 
-The first implementation uses min-max scaling for interpretable 0-to-1 feature vectors. Future versions may compare z-score scaling, robust scaling, percentile ranks, PSI, and Jensen-Shannon divergence.
+The first implementation uses min-max scaling for interpretable 0-to-1 feature vectors. Cosine similarity is then computed on the normalized feature vectors. Future versions may compare z-score scaling, robust scaling, percentile ranks, PSI, and Jensen-Shannon divergence.
