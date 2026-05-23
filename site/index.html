@@ -50,11 +50,13 @@ ul.task-list li input[type="checkbox"] {
    
   <ul class="collapse">
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology</a></li>
+  <li><a href="#player-summary" id="toc-player-summary" class="nav-link" data-scroll-target="#player-summary">Player Summary</a></li>
   <li><a href="#archetype-matches" id="toc-archetype-matches" class="nav-link" data-scroll-target="#archetype-matches">Archetype Matches</a></li>
   <li><a href="#featured-profiles" id="toc-featured-profiles" class="nav-link" data-scroll-target="#featured-profiles">Featured Profiles</a></li>
   <li><a href="#nearest-neighbors" id="toc-nearest-neighbors" class="nav-link" data-scroll-target="#nearest-neighbors">Nearest Neighbors</a></li>
   <li><a href="#position-references" id="toc-position-references" class="nav-link" data-scroll-target="#position-references">Position References</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
   </ul>
 </nav>
 </div>
@@ -82,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>This report summarizes the first player-season fingerprint pipeline. The current version uses public NBA box-score totals, builds normalized player fingerprints, and compares those fingerprints to other players, broad listed positions, and manually defined playing-style archetypes.</p>
+<p>This report summarizes the first player-season fingerprint pipeline. The current version uses public NBA box-score totals and advanced stats, builds normalized player fingerprints, and compares those fingerprints to other players, broad listed positions, and manually defined playing-style archetypes.</p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -97,12 +99,12 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td style="text-align: left;">player-season features</td>
 <td style="text-align: right;">360</td>
-<td style="text-align: right;">25</td>
+<td style="text-align: right;">34</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">normalized fingerprints</td>
 <td style="text-align: right;">360</td>
-<td style="text-align: right;">21</td>
+<td style="text-align: right;">30</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">nearest-neighbor rows</td>
@@ -123,6 +125,73 @@ ul.task-list li input[type="checkbox"] {
 <td style="text-align: left;">archetype explanation rows</td>
 <td style="text-align: right;">360</td>
 <td style="text-align: right;">9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">player summary rows</td>
+<td style="text-align: right;">360</td>
+<td style="text-align: right;">19</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="methodology" class="level2">
+<h2 class="anchored" data-anchor-id="methodology">Methodology</h2>
+<p>The unit of analysis is one NBA player-season. Raw counting stats are converted into rate-based and context-aware features so the comparison is not driven only by minutes played. The current fingerprint includes per-36 production, shooting mix, efficiency, usage rate, assist percentage, rebound percentages, pace, net rating, and player impact estimate.</p>
+<p>Before similarity scoring, each fingerprint feature is min-max scaled to a 0-to-1 range within the comparison set. This puts different basketball measurements on a common scale, allowing the model to compare profile shape rather than raw units. The tradeoff is that min-max scaling can be sensitive to extreme values, so robust scaling and percentile ranks are natural future checks.</p>
+<p>Cosine similarity is used as the main resemblance metric. In this context, cosine similarity measures whether two normalized statistical profiles point in a similar direction. It should be read as stylistic resemblance, not as a player quality grade, causal claim, or projection model.</p>
+<p>Reference profiles are built in two ways. Broad position references use NBA-listed <code>G</code>, <code>F</code>, and <code>C</code> labels as loose anchors. Archetype references use transparent manual weights over basketball features, which makes labels such as <code>high_usage_creator</code>, <code>three_and_d_wing</code>, and <code>rim_running_center</code> easier to inspect and explain.</p>
+<p>The default export uses a 500-minute threshold. This reduces noise from low-minute players whose rate statistics can swing heavily in small samples.</p>
+</section>
+<section id="player-summary" class="level2">
+<h2 class="anchored" data-anchor-id="player-summary">Player Summary</h2>
+<p>The player summary table combines each player's top neighbor, top broad position reference, top archetype, and top-match explanation into one row.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">player_name</th>
+<th style="text-align: left;">team</th>
+<th style="text-align: left;">position</th>
+<th style="text-align: left;">top_archetype</th>
+<th style="text-align: left;">top_neighbor</th>
+<th style="text-align: left;">top_position_reference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Stephen Curry</td>
+<td style="text-align: left;">GSW</td>
+<td style="text-align: left;">G</td>
+<td style="text-align: left;">high_usage_creator</td>
+<td style="text-align: left;">Tyler Herro</td>
+<td style="text-align: left;">G</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Victor Wembanyama</td>
+<td style="text-align: left;">SAS</td>
+<td style="text-align: left;">F-C</td>
+<td style="text-align: left;">interior_defensive_big</td>
+<td style="text-align: left;">Scottie Barnes</td>
+<td style="text-align: left;">C</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rudy Gobert</td>
+<td style="text-align: left;">MIN</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">rim_running_center</td>
+<td style="text-align: left;">Ivica Zubac</td>
+<td style="text-align: left;">C</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alex Caruso</td>
+<td style="text-align: left;">CHI</td>
+<td style="text-align: left;">G</td>
+<td style="text-align: left;">three_and_d_wing</td>
+<td style="text-align: left;">Jalen Suggs</td>
+<td style="text-align: left;">G</td>
 </tr>
 </tbody>
 </table>
@@ -651,9 +720,17 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </section>
-<section id="notes" class="level2">
-<h2 class="anchored" data-anchor-id="notes">Notes</h2>
-<p>The current fingerprints are box-score-only. The next data improvements should add advanced stats such as usage rate, assist rate, rebound rates, and pace/context indicators. Play-type features like isolation, pick-and-roll, handoff, catch-and-shoot, and rim running would make the archetypes more basketball-specific once a stable public source is available.</p>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<p>This MVP is designed to be explainable and reproducible, but it still has important limitations.</p>
+<ul>
+<li>The current data comes from public box-score and advanced-stat endpoints. It does not yet include play-type tracking such as isolation, pick-and-roll, handoff, catch-and-shoot, or rim-running possessions.</li>
+<li>NBA-listed position metadata is broad. The public endpoint provides labels such as <code>G</code>, <code>F</code>, and <code>C</code>, not a clean <code>PG/SG/SF/PF/C</code> role taxonomy.</li>
+<li>Archetype references are manually weighted in this version. That makes them transparent, but the weights should be tested against clustering, sensitivity checks, and basketball review.</li>
+<li>Cosine similarity measures statistical profile resemblance. It does not account for role constraints, team scheme, defensive matchup context, injuries, playoff usage, or lineup effects.</li>
+<li>The 500-minute threshold improves stability but excludes lower-minute players who may still be analytically interesting.</li>
+</ul>
+<p>Future versions should add hybrid labels, outlier flags, season-over-season stability metrics, clustering comparisons, and richer play-type data if a stable public source is available.</p>
 </section>
 
 </main>

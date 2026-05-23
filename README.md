@@ -153,13 +153,13 @@ Render the portfolio report with Quarto:
 quarto render reports/player_fingerprint_report.qmd
 ```
 
-Publish the MVP report through GitHub Pages:
+Refresh the GitHub Pages site after rendering:
 
 ```powershell
 Copy-Item reports/player_fingerprint_report.html site/index.html -Force
 Copy-Item reports/player_fingerprint_report_files site/player_fingerprint_report_files -Recurse -Force
-git add site .github/workflows/pages.yml
-git commit -m "Publish MVP report site"
+git add site reports/player_fingerprint_report.qmd
+git commit -m "Refresh MVP report site"
 git push origin main
 ```
 
