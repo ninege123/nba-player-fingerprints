@@ -16,6 +16,8 @@ data/raw/
 data/processed/
 outputs/
 reports/generated/
+reports/*.html
+reports/*_files/
 *.csv
 *.parquet
 *.duckdb

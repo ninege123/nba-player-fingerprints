@@ -8,7 +8,11 @@ from pathlib import Path
 import pandas as pd
 
 from nba_fingerprints.data.nba_api_client import load_player_index, load_player_season_stats
-from nba_fingerprints.features.archetypes import build_archetype_references, score_archetype_similarity
+from nba_fingerprints.features.archetypes import (
+    build_archetype_references,
+    explain_top_archetype_matches,
+    score_archetype_similarity,
+)
 from nba_fingerprints.features.fingerprints import build_fingerprint_table
 from nba_fingerprints.features.player_season import build_player_season_features
 from nba_fingerprints.features.positions import attach_position_labels, build_position_references, score_position_similarity
@@ -29,6 +33,7 @@ class PlayerSeasonExportPaths:
     position_scores: Path
     archetype_references: Path
     archetype_scores: Path
+    archetype_explanations: Path
 
 
 def player_season_export_paths(
@@ -51,6 +56,7 @@ def player_season_export_paths(
         position_scores=output_path / f"player_position_scores_{safe_season}.{suffix}",
         archetype_references=output_path / f"archetype_references_{safe_season}.{suffix}",
         archetype_scores=output_path / f"player_archetype_scores_{safe_season}.{suffix}",
+        archetype_explanations=output_path / f"player_archetype_explanations_{safe_season}.{suffix}",
     )
 
 
@@ -60,7 +66,16 @@ def build_player_season_export_tables(
     player_index: pd.DataFrame | None = None,
     min_minutes: float = 500.0,
     top_n: int = 5,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+]:
     """Build processed feature, fingerprint, and nearest-neighbor tables."""
     features = build_player_season_features(raw_stats, season=season, min_minutes=min_minutes)
     if player_index is not None:
@@ -80,7 +95,17 @@ def build_player_season_export_tables(
     )
     archetype_references = build_archetype_references()
     archetype_scores = score_archetype_similarity(fingerprints, archetype_references)
-    return features, fingerprints, neighbors, position_references, position_scores, archetype_references, archetype_scores
+    archetype_explanations = explain_top_archetype_matches(fingerprints, archetype_references, archetype_scores)
+    return (
+        features,
+        fingerprints,
+        neighbors,
+        position_references,
+        position_scores,
+        archetype_references,
+        archetype_scores,
+        archetype_explanations,
+    )
 
 
 def export_player_season_tables(
@@ -113,6 +138,7 @@ def export_player_season_tables(
         position_scores,
         archetype_references,
         archetype_scores,
+        archetype_explanations,
     ) = build_player_season_export_tables(
         raw_stats,
         season=season,
@@ -129,6 +155,7 @@ def export_player_season_tables(
     _write_frame(position_scores, paths.position_scores)
     _write_frame(archetype_references, paths.archetype_references)
     _write_frame(archetype_scores, paths.archetype_scores)
+    _write_frame(archetype_explanations, paths.archetype_explanations)
     return paths
 
 

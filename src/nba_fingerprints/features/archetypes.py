@@ -125,3 +125,81 @@ def score_archetype_similarity(
         ascending=False,
     )
     return scores.sort_values(["player_name", "archetype_rank"]).reset_index(drop=True)
+
+
+def explain_top_archetype_matches(
+    fingerprints: pd.DataFrame,
+    archetype_references: pd.DataFrame,
+    archetype_scores: pd.DataFrame,
+    feature_columns: Sequence[str] = FINGERPRINT_FEATURE_COLUMNS,
+    rank: int = 1,
+    top_n_features: int = 3,
+) -> pd.DataFrame:
+    """Explain top player-archetype matches with supporting features and gaps."""
+    validate_columns(
+        fingerprints,
+        ["season", "player_id", "team_abbreviation", *feature_columns],
+        dataset_name="fingerprints",
+    )
+    validate_columns(archetype_references, ["archetype", *feature_columns], dataset_name="archetype references")
+    validate_columns(
+        archetype_scores,
+        [
+            "season",
+            "player_id",
+            "player_name",
+            "team_abbreviation",
+            "archetype",
+            "cosine_similarity",
+            "archetype_rank",
+        ],
+        dataset_name="archetype scores",
+    )
+
+    target_scores = archetype_scores[archetype_scores["archetype_rank"] == rank].copy()
+    merged = target_scores.merge(
+        fingerprints.loc[:, ["season", "player_id", "team_abbreviation", *feature_columns]],
+        on=["season", "player_id", "team_abbreviation"],
+        how="left",
+    ).merge(
+        archetype_references,
+        on="archetype",
+        how="left",
+        suffixes=("_player", "_archetype"),
+    )
+
+    rows: list[dict[str, object]] = []
+    for _, row in merged.iterrows():
+        player_values = {feature: float(row[f"{feature}_player"]) for feature in feature_columns}
+        archetype_values = {feature: float(row[f"{feature}_archetype"]) for feature in feature_columns}
+
+        support = {
+            feature: min(player_values[feature], archetype_values[feature])
+            for feature in feature_columns
+            if archetype_values[feature] > 0
+        }
+        gaps = {
+            feature: abs(player_values[feature] - archetype_values[feature])
+            for feature in feature_columns
+            if archetype_values[feature] > 0
+        }
+        rows.append(
+            {
+                "season": row["season"],
+                "player_id": row["player_id"],
+                "player_name": row["player_name"],
+                "team_abbreviation": row["team_abbreviation"],
+                "archetype": row["archetype"],
+                "cosine_similarity": row["cosine_similarity"],
+                "archetype_rank": row["archetype_rank"],
+                "supporting_features": _format_feature_list(support, top_n_features, descending=True),
+                "gap_features": _format_feature_list(gaps, top_n_features, descending=True),
+            }
+        )
+
+    return pd.DataFrame(rows).sort_values(["player_name", "archetype_rank"]).reset_index(drop=True)
+
+
+def _format_feature_list(values: Mapping[str, float], limit: int, descending: bool) -> str:
+    ordered = sorted(values.items(), key=lambda item: item[1], reverse=descending)[:limit]
+    return "; ".join(f"{feature}={value:.3f}" for feature, value in ordered)

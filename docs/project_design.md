@@ -51,3 +51,5 @@ Manual archetypes are the first pass because they are easier to explain. Cluster
 - Processed feature, fingerprint, and neighbor tables can be exported to `data/processed/`.
 - NBA-listed broad position references (`G`, `F`, `C`) can be built and scored. Granular role labels such as floor general, scoring guard, 3-and-D wing, and stretch big should come from the archetype layer rather than treating listed positions as absolute truth.
 - Manual archetype references can be built from transparent feature weights and scored against every player fingerprint.
+- Top archetype matches can be explained with supporting feature dimensions and largest gaps.
+- A Quarto report can read the processed outputs and present portfolio-facing tables and base R charts.

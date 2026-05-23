@@ -52,6 +52,8 @@ The first archetype layer uses transparent feature weights over the normalized f
 - `interior_defensive_big`
 - `high_usage_creator`
 
+The `player_archetype_explanations` output summarizes each player's top-ranked archetype match with the strongest supporting normalized feature dimensions and the largest gaps from the archetype reference.
+
 ## Normalization
 
 The first implementation uses min-max scaling for interpretable 0-to-1 feature vectors. Cosine similarity is then computed on the normalized feature vectors. Future versions may compare z-score scaling, robust scaling, percentile ranks, PSI, and Jensen-Shannon divergence.

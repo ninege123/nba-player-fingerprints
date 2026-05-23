@@ -81,4 +81,23 @@ This writes:
 - `data/processed/player_position_scores_2023_24.csv`
 - `data/processed/archetype_references_2023_24.csv`
 - `data/processed/player_archetype_scores_2023_24.csv`
+- `data/processed/player_archetype_explanations_2023_24.csv`
+
+Render the portfolio report with Quarto:
+
+```powershell
+quarto render reports/player_fingerprint_report.qmd
+```
+
+Publish the MVP report through GitHub Pages:
+
+```powershell
+Copy-Item reports/player_fingerprint_report.html site/index.html -Force
+Copy-Item reports/player_fingerprint_report_files site/player_fingerprint_report_files -Recurse -Force
+git add site .github/workflows/pages.yml
+git commit -m "Publish MVP report site"
+git push origin main
+```
+
+The GitHub Pages workflow publishes the committed `site/` folder as a static site.
 

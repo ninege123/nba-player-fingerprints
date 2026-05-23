@@ -1,0 +1,113 @@
+---
+title: "NBA Player Fingerprints"
+subtitle: "Player-season similarity, archetypes, and explainability"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    theme: cosmo
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+source("../R/report_helpers.R")
+season <- "2023-24"
+outputs <- load_player_fingerprint_outputs(season = season, processed_dir = "../data/processed")
+```
+
+## Overview
+
+This report summarizes the first player-season fingerprint pipeline. The current version uses public NBA box-score totals, builds normalized player fingerprints, and compares those fingerprints to other players, broad listed positions, and manually defined playing-style archetypes.
+
+```{r}
+summary_table <- data.frame(
+  output = c(
+    "player-season features",
+    "normalized fingerprints",
+    "nearest-neighbor rows",
+    "position score rows",
+    "archetype score rows",
+    "archetype explanation rows"
+  ),
+  rows = c(
+    nrow(outputs$features),
+    nrow(outputs$fingerprints),
+    nrow(outputs$neighbors),
+    nrow(outputs$position_scores),
+    nrow(outputs$archetype_scores),
+    nrow(outputs$archetype_explanations)
+  ),
+  columns = c(
+    ncol(outputs$features),
+    ncol(outputs$fingerprints),
+    ncol(outputs$neighbors),
+    ncol(outputs$position_scores),
+    ncol(outputs$archetype_scores),
+    ncol(outputs$archetype_explanations)
+  )
+)
+knitr::kable(summary_table)
+```
+
+## Archetype Matches
+
+The archetype layer uses transparent feature weights over the normalized fingerprint columns. These labels are not treated as ground truth. They are reference profiles that make player style easier to inspect.
+
+```{r}
+top_matches <- top_archetype_matches(outputs$archetype_scores, n = 20)
+knitr::kable(
+  top_matches[, c("player_name", "team_abbreviation", "archetype", "cosine_similarity")]
+)
+```
+
+```{r}
+plot_top_archetype_counts(outputs$archetype_scores)
+```
+
+## Featured Profiles
+
+```{r}
+featured_players <- c("Stephen Curry", "Victor Wembanyama", "Rudy Gobert", "Alex Caruso")
+for (player in featured_players) {
+  cat("\n\n### ", player, "\n\n", sep = "")
+  profile <- player_archetype_profile(outputs$archetype_scores, player)
+  print(knitr::kable(profile[, c("archetype_rank", "archetype", "cosine_similarity")]))
+  explanation <- outputs$archetype_explanations[outputs$archetype_explanations$player_name == player, ]
+  if (nrow(explanation) > 0) {
+    print(knitr::kable(explanation[, c("archetype", "supporting_features", "gap_features")]))
+  }
+  plot_archetype_profile(outputs$archetype_scores, player)
+}
+```
+
+## Nearest Neighbors
+
+Nearest neighbors compare each player-season fingerprint to every other player-season fingerprint with cosine similarity.
+
+```{r}
+neighbor_examples <- do.call(
+  rbind,
+  lapply(featured_players, function(player) player_neighbors(outputs$neighbors, player, n = 5))
+)
+knitr::kable(
+  neighbor_examples[, c("player_name", "neighbor_rank", "neighbor_player_name", "neighbor_team_abbreviation", "cosine_similarity")]
+)
+```
+
+## Position References
+
+NBA public metadata currently exposes broad listed positions such as `G`, `F`, and `C`. These are useful anchors, but the archetype layer carries the richer basketball role language.
+
+```{r}
+top_position <- outputs$position_scores[outputs$position_scores$position_rank == 1, ]
+position_summary <- as.data.frame(sort(table(top_position$reference_position), decreasing = TRUE))
+names(position_summary) <- c("reference_position", "players")
+knitr::kable(position_summary)
+```
+
+## Notes
+
+The current fingerprints are box-score-only. The next data improvements should add advanced stats such as usage rate, assist rate, rebound rates, and pace/context indicators. Play-type features like isolation, pick-and-roll, handoff, catch-and-shoot, and rim running would make the archetypes more basketball-specific once a stable public source is available.

@@ -56,6 +56,7 @@ class PlayerSeasonExportTests(unittest.TestCase):
             position_scores,
             archetype_references,
             archetype_scores,
+            archetype_explanations,
         ) = build_player_season_export_tables(
             self.raw_stats,
             season="2023-24",
@@ -77,6 +78,7 @@ class PlayerSeasonExportTests(unittest.TestCase):
         self.assertEqual(position_scores.shape[0], 6)
         self.assertEqual(archetype_references.shape[0], 8)
         self.assertEqual(archetype_scores.shape[0], 24)
+        self.assertEqual(archetype_explanations.shape[0], 3)
 
     def test_export_player_season_tables_writes_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -103,6 +105,7 @@ class PlayerSeasonExportTests(unittest.TestCase):
             self.assertTrue(paths.position_scores.exists())
             self.assertTrue(paths.archetype_references.exists())
             self.assertTrue(paths.archetype_scores.exists())
+            self.assertTrue(paths.archetype_explanations.exists())
             self.assertEqual(pd.read_csv(paths.neighbors).shape[0], 3)
 
 

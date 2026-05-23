@@ -39,6 +39,7 @@ def main() -> None:
         print(f"position_scores: {paths.position_scores}")
         print(f"archetype_references: {paths.archetype_references}")
         print(f"archetype_scores: {paths.archetype_scores}")
+        print(f"archetype_explanations: {paths.archetype_explanations}")
 
 
 if __name__ == "__main__":
