@@ -4,6 +4,12 @@ This project builds player-season fingerprints for NBA players using public bask
 
 The goal is to compare players to position references, style archetypes, and other players using similarity analysis, outlier detection, and explainable visualizations.
 
+## Live MVP Report
+
+View the rendered report here:
+
+https://ninege123.github.io/nba-player-fingerprints/
+
 ## Project Motivation
 
 Traditional NBA analysis often focuses on box-score totals or prediction tasks. This project focuses on player identity: what does a player's statistical profile look like, and which players or archetypes are most similar?
