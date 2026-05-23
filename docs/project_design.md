@@ -9,7 +9,7 @@ Build player-season fingerprints for NBA players using public basketball data. A
 - Grain: one row per player per season.
 - Data: public NBA player season box-score and advanced stat tables.
 - Implementation: Python package code for ingestion, feature engineering, and similarity; notebooks for exploration and portfolio storytelling.
-- Comparisons: player-to-position, player-to-archetype, and player-to-player similarity.
+- Comparisons: player-to-listed-position, player-to-archetype, and player-to-player similarity.
 
 ## Pipeline
 
@@ -48,3 +48,6 @@ Manual archetypes are the first pass because they are easier to explain. Cluster
 - First-pass player-season features can be engineered from box-score totals.
 - Features can be min-max scaled into normalized fingerprint tables.
 - Player-to-player nearest neighbors can be scored with cosine similarity.
+- Processed feature, fingerprint, and neighbor tables can be exported to `data/processed/`.
+- NBA-listed broad position references (`G`, `F`, `C`) can be built and scored. Granular role labels such as floor general, scoring guard, 3-and-D wing, and stretch big should come from the archetype layer rather than treating listed positions as absolute truth.
+- Manual archetype references can be built from transparent feature weights and scored against every player fingerprint.

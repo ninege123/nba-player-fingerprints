@@ -8,7 +8,7 @@
 
 - Player season traditional stats from `LeagueDashPlayerStats` with `measure_type="Base"` and `per_mode="Totals"`.
 - Player season advanced stats from the same endpoint with `measure_type="Advanced"`.
-- Player biographical or common info for position labels.
+- Player index metadata from `PlayerIndex` for NBA-listed broad position labels.
 
 ## Later sources
 
@@ -26,3 +26,5 @@
 ## Current ingestion entry point
 
 Use `nba_fingerprints.data.nba_api_client.load_player_season_stats()` to load one player-season stat table. The function checks the local cache first and only calls the NBA Stats API when a cache file is absent or cache use is disabled.
+
+Use `nba_fingerprints.data.nba_api_client.load_player_index()` to load player metadata, including `POSITION`. In the current NBA endpoint this is a broad listed label such as `G`, `F`, `C`, `G-F`, or `F-C`, not a guaranteed `PG/SG/SF/PF/C` role label.

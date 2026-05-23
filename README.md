@@ -66,3 +66,19 @@ neighbors = find_nearest_neighbors(fingerprints, top_n=5)
 print(neighbors.head())
 ```
 
+Export processed CSVs for manual inspection:
+
+```powershell
+$env:PYTHONPATH="src"; .\.venv\Scripts\python.exe -m nba_fingerprints.cli export-player-season --season 2023-24 --min-minutes 500 --top-n 5
+```
+
+This writes:
+
+- `data/processed/player_season_features_2023_24.csv`
+- `data/processed/player_fingerprints_2023_24.csv`
+- `data/processed/player_neighbors_2023_24.csv`
+- `data/processed/position_references_2023_24.csv`
+- `data/processed/player_position_scores_2023_24.csv`
+- `data/processed/archetype_references_2023_24.csv`
+- `data/processed/player_archetype_scores_2023_24.csv`
+

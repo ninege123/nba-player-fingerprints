@@ -39,6 +39,19 @@ This file defines the first-pass player-season fingerprint dimensions. The exact
 - `turnover_rate`: Turnovers per possession estimate.
 - Position labels and play-type frequencies once reliable public sources are integrated.
 
+## Manual archetype references
+
+The first archetype layer uses transparent feature weights over the normalized fingerprint columns. These references are intentionally simple and explainable:
+
+- `floor_general`
+- `scoring_guard`
+- `three_and_d_wing`
+- `point_forward`
+- `stretch_big`
+- `rim_running_center`
+- `interior_defensive_big`
+- `high_usage_creator`
+
 ## Normalization
 
 The first implementation uses min-max scaling for interpretable 0-to-1 feature vectors. Cosine similarity is then computed on the normalized feature vectors. Future versions may compare z-score scaling, robust scaling, percentile ranks, PSI, and Jensen-Shannon divergence.

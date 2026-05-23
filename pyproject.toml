@@ -15,5 +15,8 @@ dependencies = [
     "scikit-learn",
 ]
 
+[project.scripts]
+nba-fingerprints = "nba_fingerprints.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]

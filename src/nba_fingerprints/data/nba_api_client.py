@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
-from nba_api.stats.endpoints import leaguedashplayerstats
+from nba_api.stats.endpoints import leaguedashplayerstats, playerindex
 
 from nba_fingerprints.data.cache import cache_path, cached_frame_exists, read_cached_frame, write_cached_frame
 from nba_fingerprints.features.schema import validate_columns
@@ -19,6 +19,13 @@ PLAYER_STATS_REQUIRED_COLUMNS = [
     "AGE",
     "GP",
     "MIN",
+]
+
+PLAYER_INDEX_REQUIRED_COLUMNS = [
+    "PERSON_ID",
+    "TEAM_ID",
+    "TEAM_ABBREVIATION",
+    "POSITION",
 ]
 
 
@@ -66,5 +73,35 @@ def load_player_season_stats(
         season_type=season_type,
         timeout=timeout,
     )
+    write_cached_frame(frame, path)
+    return frame
+
+
+def fetch_player_index(
+    season: str,
+    historical: str = "1",
+    timeout: int = 30,
+) -> pd.DataFrame:
+    """Fetch NBA player index metadata, including listed positions."""
+    endpoint = playerindex.PlayerIndex(season=season, historical_nullable=historical, timeout=timeout)
+    frame = endpoint.get_data_frames()[0]
+    validate_columns(frame, PLAYER_INDEX_REQUIRED_COLUMNS, dataset_name="player index")
+    return frame
+
+
+def load_player_index(
+    season: str,
+    cache_dir: Path | str = "data/raw",
+    use_cache: bool = True,
+    file_format: str = "parquet",
+    timeout: int = 30,
+) -> pd.DataFrame:
+    """Load player index metadata from cache or the NBA Stats API."""
+    path = cache_path("player_index_historical", season, cache_dir=cache_dir, file_format=file_format)
+
+    if use_cache and cached_frame_exists(path):
+        return read_cached_frame(path)
+
+    frame = fetch_player_index(season=season, timeout=timeout)
     write_cached_frame(frame, path)
     return frame
