@@ -40,6 +40,7 @@ def main() -> None:
         print(f"archetype_references: {paths.archetype_references}")
         print(f"archetype_scores: {paths.archetype_scores}")
         print(f"archetype_explanations: {paths.archetype_explanations}")
+        print(f"player_summary: {paths.player_summary}")
 
 
 if __name__ == "__main__":

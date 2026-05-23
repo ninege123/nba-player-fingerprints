@@ -24,7 +24,8 @@ load_player_fingerprint_outputs <- function(season = "2023-24", processed_dir = 
     neighbors = read_processed_csv(paste0("player_neighbors_", season_key, ".csv"), processed_dir),
     position_scores = read_processed_csv(paste0("player_position_scores_", season_key, ".csv"), processed_dir),
     archetype_scores = read_processed_csv(paste0("player_archetype_scores_", season_key, ".csv"), processed_dir),
-    archetype_explanations = read_processed_csv(paste0("player_archetype_explanations_", season_key, ".csv"), processed_dir)
+    archetype_explanations = read_processed_csv(paste0("player_archetype_explanations_", season_key, ".csv"), processed_dir),
+    player_summary = read_processed_csv(paste0("player_summary_", season_key, ".csv"), processed_dir)
   )
 }
 

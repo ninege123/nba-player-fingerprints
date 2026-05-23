@@ -78,6 +78,62 @@ class PlayerSeasonFeatureTests(unittest.TestCase):
 
         self.assertTrue((features[FINGERPRINT_FEATURE_COLUMNS] == 0.0).all(axis=None))
 
+    def test_build_player_season_features_merges_advanced_stats(self) -> None:
+        raw = pd.DataFrame(
+            {
+                "PLAYER_ID": [1],
+                "PLAYER_NAME": ["Advanced Guard"],
+                "TEAM_ID": [100],
+                "TEAM_ABBREVIATION": ["TST"],
+                "AGE": [25],
+                "GP": [10],
+                "MIN": [360],
+                "FGM": [80],
+                "FGA": [160],
+                "FG3M": [30],
+                "FG3A": [80],
+                "FTA": [40],
+                "OREB": [10],
+                "DREB": [30],
+                "REB": [40],
+                "AST": [60],
+                "TOV": [20],
+                "STL": [15],
+                "BLK": [5],
+                "PF": [25],
+                "PTS": [230],
+            }
+        )
+        advanced = pd.DataFrame(
+            {
+                "PLAYER_ID": [1],
+                "TEAM_ID": [100],
+                "AST_PCT": [0.35],
+                "OREB_PCT": [0.02],
+                "DREB_PCT": [0.12],
+                "REB_PCT": [0.07],
+                "TM_TOV_PCT": [11.2],
+                "TS_PCT": [0.61],
+                "USG_PCT": [0.28],
+                "PACE": [99.5],
+                "PIE": [0.14],
+                "NET_RATING": [8.1],
+            }
+        )
+
+        features = build_player_season_features(raw, season="2023-24", advanced_stats=advanced)
+        row = features.iloc[0]
+
+        self.assertEqual(row["usage_rate"], 0.28)
+        self.assertEqual(row["assist_pct"], 0.35)
+        self.assertEqual(row["offensive_rebound_pct"], 0.02)
+        self.assertEqual(row["defensive_rebound_pct"], 0.12)
+        self.assertEqual(row["total_rebound_pct"], 0.07)
+        self.assertEqual(row["turnover_pct"], 11.2)
+        self.assertEqual(row["pace"], 99.5)
+        self.assertEqual(row["player_impact_estimate"], 0.14)
+        self.assertEqual(row["net_rating"], 8.1)
+
     def test_build_player_season_features_filters_by_min_minutes(self) -> None:
         raw = pd.DataFrame(
             {

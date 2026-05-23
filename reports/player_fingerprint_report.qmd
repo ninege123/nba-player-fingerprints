@@ -30,7 +30,8 @@ summary_table <- data.frame(
     "nearest-neighbor rows",
     "position score rows",
     "archetype score rows",
-    "archetype explanation rows"
+    "archetype explanation rows",
+    "player summary rows"
   ),
   rows = c(
     nrow(outputs$features),
@@ -38,7 +39,8 @@ summary_table <- data.frame(
     nrow(outputs$neighbors),
     nrow(outputs$position_scores),
     nrow(outputs$archetype_scores),
-    nrow(outputs$archetype_explanations)
+    nrow(outputs$archetype_explanations),
+    nrow(outputs$player_summary)
   ),
   columns = c(
     ncol(outputs$features),
@@ -46,10 +48,23 @@ summary_table <- data.frame(
     ncol(outputs$neighbors),
     ncol(outputs$position_scores),
     ncol(outputs$archetype_scores),
-    ncol(outputs$archetype_explanations)
+    ncol(outputs$archetype_explanations),
+    ncol(outputs$player_summary)
   )
 )
 knitr::kable(summary_table)
+```
+
+## Player Summary
+
+The player summary table combines each player's top neighbor, top broad position reference, top archetype, and top-match explanation into one row.
+
+```{r}
+summary_preview <- outputs$player_summary[
+  order(-outputs$player_summary$top_archetype_similarity),
+  c("player_name", "team_abbreviation", "position", "top_archetype", "top_archetype_similarity", "top_neighbor", "top_neighbor_similarity")
+]
+knitr::kable(head(summary_preview, 20))
 ```
 
 ## Archetype Matches

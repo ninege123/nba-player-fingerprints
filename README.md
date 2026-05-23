@@ -1,6 +1,6 @@
 # NBA Player Fingerprints
 
-This project builds player-season fingerprints for NBA players using public basketball data. A fingerprint is a normalized feature vector that describes a player's role, position tendencies, and style of play.
+This project builds player-season fingerprints for NBA players using public basketball data. A fingerprint is a normalized feature vector that describes a player's role, position tendencies, and style of play using box-score and advanced-stat indicators.
 
 The goal is to compare players to position references, style archetypes, and other players using similarity analysis, outlier detection, and explainable visualizations.
 
@@ -82,6 +82,7 @@ This writes:
 - `data/processed/archetype_references_2023_24.csv`
 - `data/processed/player_archetype_scores_2023_24.csv`
 - `data/processed/player_archetype_explanations_2023_24.csv`
+- `data/processed/player_summary_2023_24.csv`
 
 Render the portfolio report with Quarto:
 

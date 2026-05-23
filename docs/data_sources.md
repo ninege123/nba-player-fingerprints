@@ -7,7 +7,7 @@
 ## Planned tables
 
 - Player season traditional stats from `LeagueDashPlayerStats` with `measure_type="Base"` and `per_mode="Totals"`.
-- Player season advanced stats from the same endpoint with `measure_type="Advanced"`.
+- Player season advanced stats from the same endpoint with `measure_type="Advanced"`, including usage, assist, rebound, pace, impact, and rating context.
 - Player index metadata from `PlayerIndex` for NBA-listed broad position labels.
 
 ## Later sources

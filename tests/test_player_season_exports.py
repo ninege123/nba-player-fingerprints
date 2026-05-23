@@ -39,6 +39,22 @@ class PlayerSeasonExportTests(unittest.TestCase):
                 "PTS": [230, 222, 222],
             }
         )
+        self.advanced_stats = pd.DataFrame(
+            {
+                "PLAYER_ID": [1, 2, 3],
+                "TEAM_ID": [100, 200, 300],
+                "AST_PCT": [0.30, 0.28, 0.10],
+                "OREB_PCT": [0.02, 0.02, 0.12],
+                "DREB_PCT": [0.10, 0.09, 0.28],
+                "REB_PCT": [0.06, 0.06, 0.20],
+                "TM_TOV_PCT": [10.0, 9.5, 13.0],
+                "TS_PCT": [0.60, 0.59, 0.65],
+                "USG_PCT": [0.28, 0.27, 0.20],
+                "PACE": [100.0, 101.0, 98.0],
+                "PIE": [0.13, 0.12, 0.16],
+                "NET_RATING": [5.0, 4.0, 6.0],
+            }
+        )
 
     def test_player_season_export_paths_uses_stable_names(self) -> None:
         paths = player_season_export_paths("2023-24", output_dir="processed-test")
@@ -57,9 +73,11 @@ class PlayerSeasonExportTests(unittest.TestCase):
             archetype_references,
             archetype_scores,
             archetype_explanations,
+            player_summary,
         ) = build_player_season_export_tables(
             self.raw_stats,
             season="2023-24",
+            advanced_stats=self.advanced_stats,
             player_index=pd.DataFrame(
                 {
                     "PERSON_ID": [1, 2, 3],
@@ -79,6 +97,7 @@ class PlayerSeasonExportTests(unittest.TestCase):
         self.assertEqual(archetype_references.shape[0], 8)
         self.assertEqual(archetype_scores.shape[0], 24)
         self.assertEqual(archetype_explanations.shape[0], 3)
+        self.assertEqual(player_summary.shape[0], 3)
 
     def test_export_player_season_tables_writes_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -89,7 +108,10 @@ class PlayerSeasonExportTests(unittest.TestCase):
                     "POSITION": ["G", "G", "C"],
                 }
             )
-            with patch("nba_fingerprints.pipelines.player_season_exports.load_player_season_stats", return_value=self.raw_stats):
+            with patch(
+                "nba_fingerprints.pipelines.player_season_exports.load_player_season_stats",
+                side_effect=[self.raw_stats, self.advanced_stats],
+            ):
                 with patch("nba_fingerprints.pipelines.player_season_exports.load_player_index", return_value=player_index):
                     paths = export_player_season_tables(
                         "2023-24",
@@ -106,6 +128,7 @@ class PlayerSeasonExportTests(unittest.TestCase):
             self.assertTrue(paths.archetype_references.exists())
             self.assertTrue(paths.archetype_scores.exists())
             self.assertTrue(paths.archetype_explanations.exists())
+            self.assertTrue(paths.player_summary.exists())
             self.assertEqual(pd.read_csv(paths.neighbors).shape[0], 3)
 
 

@@ -44,12 +44,13 @@ Manual archetypes are the first pass because they are easier to explain. Cluster
 
 ## Current implementation status
 
-- Player-season box-score totals can be loaded through `nba_api` and cached locally.
-- First-pass player-season features can be engineered from box-score totals.
+- Player-season box-score totals and advanced stats can be loaded through `nba_api` and cached locally.
+- First-pass player-season features can be engineered from box-score totals plus advanced usage, assist, rebound, pace, and impact indicators.
 - Features can be min-max scaled into normalized fingerprint tables.
 - Player-to-player nearest neighbors can be scored with cosine similarity.
 - Processed feature, fingerprint, and neighbor tables can be exported to `data/processed/`.
 - NBA-listed broad position references (`G`, `F`, `C`) can be built and scored. Granular role labels such as floor general, scoring guard, 3-and-D wing, and stretch big should come from the archetype layer rather than treating listed positions as absolute truth.
 - Manual archetype references can be built from transparent feature weights and scored against every player fingerprint.
 - Top archetype matches can be explained with supporting feature dimensions and largest gaps.
+- A player summary table combines top neighbor, top position reference, top archetype, and explanation fields for easier manual review.
 - A Quarto report can read the processed outputs and present portfolio-facing tables and base R charts.

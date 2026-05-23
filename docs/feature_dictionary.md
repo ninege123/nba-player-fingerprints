@@ -6,6 +6,10 @@ This file defines the first-pass player-season fingerprint dimensions. The exact
 
 - `minutes_per_game`: How large the player's role is.
 - `points_per_36`: Scoring volume normalized to 36 minutes.
+- `usage_rate`: Share of team possessions used while the player is on the floor.
+- `pace`: Possession environment while the player is on the floor.
+- `player_impact_estimate`: NBA advanced-stat estimate of all-around impact.
+- `net_rating`: Team point differential per 100 possessions while the player is on the floor.
 
 ## Scoring and shooting
 
@@ -19,12 +23,17 @@ This file defines the first-pass player-season fingerprint dimensions. The exact
 - `assists_per_36`: Assist volume normalized to 36 minutes.
 - `turnovers_per_36`: Turnover volume normalized to 36 minutes.
 - `assist_to_turnover`: Passing creation relative to mistakes.
+- `assist_pct`: Share of teammate field goals assisted while the player is on the floor.
+- `turnover_pct`: Team turnover percentage while the player is on the floor.
 
 ## Rebounding
 
 - `offensive_rebounds_per_36`: Offensive rebounding involvement.
 - `defensive_rebounds_per_36`: Defensive rebounding involvement.
 - `rebounds_per_36`: Overall rebounding involvement.
+- `offensive_rebound_pct`: Offensive rebound percentage while on the floor.
+- `defensive_rebound_pct`: Defensive rebound percentage while on the floor.
+- `total_rebound_pct`: Total rebound percentage while on the floor.
 
 ## Defense proxies
 
@@ -34,14 +43,11 @@ This file defines the first-pass player-season fingerprint dimensions. The exact
 
 ## Later feature candidates
 
-- `usage_rate`: Share of team possessions used while on the floor.
-- `assist_rate`: Share of teammate field goals assisted while on the floor.
-- `turnover_rate`: Turnovers per possession estimate.
 - Position labels and play-type frequencies once reliable public sources are integrated.
 
 ## Manual archetype references
 
-The first archetype layer uses transparent feature weights over the normalized fingerprint columns. These references are intentionally simple and explainable:
+The first archetype layer uses transparent feature weights over the normalized fingerprint columns. The current weights combine box-score rates with NBA advanced indicators such as `usage_rate`, `assist_pct`, rebound percentages, and `player_impact_estimate`. These references are intentionally simple and explainable:
 
 - `floor_general`
 - `scoring_guard`
