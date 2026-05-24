@@ -77,6 +77,16 @@ describe the outcome of those possessions.
 - `passes_made_per_touch`: Passing activity relative to touches.
 - `avg_seconds_per_touch`: Average time the player holds the ball per touch.
 
+### Source availability
+
+These columns are metadata flags, not fingerprint dimensions. They distinguish a true
+zero from a missing optional data source.
+
+- `has_synergy_data`: Player appears in at least one offensive Synergy play-type table.
+- `has_shot_location_data`: Player appears in the shot-location table.
+- `has_tracking_shot_data`: Player appears in catch-and-shoot or pull-up tracking tables.
+- `has_touch_tracking_data`: Player appears in drive, touch, passing, paint-touch, elbow-touch, or post-touch tracking tables.
+
 ## Playmaking
 
 - `assists_per_36`: Assist volume normalized to 36 minutes.

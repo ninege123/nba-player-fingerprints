@@ -3,6 +3,7 @@ import unittest
 import pandas as pd
 
 from nba_fingerprints.features.scoring_style import (
+    SCORING_STYLE_AVAILABILITY_COLUMNS,
     SCORING_STYLE_FEATURE_COLUMNS,
     attach_scoring_style_features,
     build_scoring_style_features,
@@ -22,8 +23,9 @@ class ScoringStyleFeatureTests(unittest.TestCase):
     def test_build_scoring_style_features_defaults_to_zero(self) -> None:
         features = build_scoring_style_features(self.player_features)
 
-        self.assertEqual(features.columns.tolist(), ["player_id", *SCORING_STYLE_FEATURE_COLUMNS])
+        self.assertEqual(features.columns.tolist(), ["player_id", *SCORING_STYLE_FEATURE_COLUMNS, *SCORING_STYLE_AVAILABILITY_COLUMNS])
         self.assertTrue((features[SCORING_STYLE_FEATURE_COLUMNS] == 0.0).all(axis=None))
+        self.assertTrue((features[SCORING_STYLE_AVAILABILITY_COLUMNS] == False).all(axis=None))
 
     def test_build_scoring_style_features_uses_synergy_play_type_stats(self) -> None:
         synergy = {
@@ -49,6 +51,7 @@ class ScoringStyleFeatureTests(unittest.TestCase):
         self.assertEqual(row["isolation_turnover_frequency"], 0.08)
         self.assertEqual(row["isolation_effective_fg_pct"], 0.54)
         self.assertEqual(row["isolation_percentile"], 0.87)
+        self.assertTrue(row["has_synergy_data"])
 
     def test_build_scoring_style_features_uses_shot_locations(self) -> None:
         shot_locations = pd.DataFrame(
@@ -78,6 +81,7 @@ class ScoringStyleFeatureTests(unittest.TestCase):
         self.assertEqual(row["above_break_three_attempt_rate"], 0.225)
         self.assertEqual(row["restricted_area_fg_pct"], 0.625)
         self.assertEqual(row["corner_three_fg_pct"], 0.4)
+        self.assertTrue(row["has_shot_location_data"])
 
     def test_build_scoring_style_features_uses_tracking_stats(self) -> None:
         tracking = {
@@ -112,6 +116,8 @@ class ScoringStyleFeatureTests(unittest.TestCase):
         self.assertEqual(row["frontcourt_touches_per_36"], 25.0)
         self.assertEqual(row["passes_made_per_touch"], 0.5)
         self.assertEqual(row["avg_seconds_per_touch"], 4.2)
+        self.assertTrue(row["has_tracking_shot_data"])
+        self.assertTrue(row["has_touch_tracking_data"])
 
     def test_attach_scoring_style_features_keeps_existing_columns(self) -> None:
         attached = attach_scoring_style_features(
@@ -121,6 +127,8 @@ class ScoringStyleFeatureTests(unittest.TestCase):
 
         self.assertIn("player_name", attached.columns)
         self.assertEqual(attached.loc[attached["player_id"] == 2, "spot_up_frequency"].iloc[0], 0.25)
+        self.assertFalse(attached.loc[attached["player_id"] == 1, "has_synergy_data"].iloc[0])
+        self.assertTrue(attached.loc[attached["player_id"] == 2, "has_synergy_data"].iloc[0])
 
 
 if __name__ == "__main__":

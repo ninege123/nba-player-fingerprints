@@ -10,6 +10,10 @@ View the rendered report here:
 
 https://ninege123.github.io/nba-player-fingerprints/
 
+View the first interactive app here:
+
+https://ninege123.github.io/nba-player-fingerprints/app/
+
 ## Project Motivation
 
 Traditional NBA analysis often focuses on box-score totals or prediction tasks. This project focuses on player identity: what does a player's statistical profile look like, and which players or archetypes are most similar?
@@ -36,6 +40,7 @@ Raw counting stats are transformed into rate-based features so players with diff
 - rebounding profile: offensive, defensive, and total rebound percentages
 - context and impact: pace, net rating, player impact estimate
 - optional scoring style: isolation, pick-and-roll, spot-up, cut, handoff, post-up, off-screen, putback, transition, shot-location, catch-and-shoot, pull-up, drive, and touch indicators
+- optional source availability flags: whether each player has Synergy, shot-location, tracking-shot, and touch-tracking coverage
 
 This avoids comparing players only by raw totals, which would mostly measure playing time and team context.
 
@@ -159,6 +164,25 @@ This writes:
 - `data/processed/player_archetype_scores_2023_24.csv`
 - `data/processed/player_archetype_explanations_2023_24.csv`
 - `data/processed/player_summary_2023_24.csv`
+- `data/processed/app_player_profiles_2023_24.csv`
+- `data/processed/app_similarity_edges_2023_24.csv`
+- `data/processed/app_feature_metadata_2023_24.csv`
+
+The app-facing files are documented in `docs/app_data_contract.md`.
+
+Generate the first static interactive app from those app-facing files:
+
+```powershell
+$env:PYTHONPATH="src"; .\.venv\Scripts\python.exe -m nba_fingerprints.app.static_app --season 2023-24 --processed-dir data/processed --output-dir site/app
+```
+
+Run it locally:
+
+```powershell
+.\.venv\Scripts\python.exe -m http.server 8000 -d site
+```
+
+Then open `http://localhost:8000/app/`.
 
 Render the portfolio report with Quarto:
 

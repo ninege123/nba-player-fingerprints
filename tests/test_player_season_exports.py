@@ -62,6 +62,9 @@ class PlayerSeasonExportTests(unittest.TestCase):
         self.assertEqual(paths.features, Path("processed-test/player_season_features_2023_24.csv"))
         self.assertEqual(paths.fingerprints, Path("processed-test/player_fingerprints_2023_24.csv"))
         self.assertEqual(paths.neighbors, Path("processed-test/player_neighbors_2023_24.csv"))
+        self.assertEqual(paths.app_player_profiles, Path("processed-test/app_player_profiles_2023_24.csv"))
+        self.assertEqual(paths.app_similarity_edges, Path("processed-test/app_similarity_edges_2023_24.csv"))
+        self.assertEqual(paths.app_feature_metadata, Path("processed-test/app_feature_metadata_2023_24.csv"))
 
     def test_build_player_season_export_tables_returns_expected_tables(self) -> None:
         (
@@ -152,7 +155,11 @@ class PlayerSeasonExportTests(unittest.TestCase):
             self.assertTrue(paths.archetype_scores.exists())
             self.assertTrue(paths.archetype_explanations.exists())
             self.assertTrue(paths.player_summary.exists())
+            self.assertTrue(paths.app_player_profiles.exists())
+            self.assertTrue(paths.app_similarity_edges.exists())
+            self.assertTrue(paths.app_feature_metadata.exists())
             self.assertEqual(pd.read_csv(paths.neighbors).shape[0], 3)
+            self.assertEqual(pd.read_csv(paths.app_player_profiles).shape[0], 3)
 
 
 if __name__ == "__main__":

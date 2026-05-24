@@ -18,7 +18,9 @@ class SummaryTests(unittest.TestCase):
                 "games_played": [82],
                 "minutes_total": [2500],
                 "minutes_per_game": [30.5],
+                "points_per_36": [24.0],
                 "usage_rate": [0.25],
+                "true_shooting_pct": [0.61],
                 "player_impact_estimate": [0.12],
             }
         )

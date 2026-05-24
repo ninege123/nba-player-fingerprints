@@ -7,6 +7,11 @@ from pathlib import Path
 
 import pandas as pd
 
+from nba_fingerprints.app.contracts import (
+    build_app_feature_metadata,
+    build_app_player_profiles,
+    build_app_similarity_edges,
+)
 from nba_fingerprints.data.nba_api_client import (
     SYNERGY_PLAY_TYPES,
     TRACKING_MEASURE_TYPES,
@@ -45,6 +50,9 @@ class PlayerSeasonExportPaths:
     archetype_scores: Path
     archetype_explanations: Path
     player_summary: Path
+    app_player_profiles: Path
+    app_similarity_edges: Path
+    app_feature_metadata: Path
 
 
 def player_season_export_paths(
@@ -69,6 +77,9 @@ def player_season_export_paths(
         archetype_scores=output_path / f"player_archetype_scores_{safe_season}.{suffix}",
         archetype_explanations=output_path / f"player_archetype_explanations_{safe_season}.{suffix}",
         player_summary=output_path / f"player_summary_{safe_season}.{suffix}",
+        app_player_profiles=output_path / f"app_player_profiles_{safe_season}.{suffix}",
+        app_similarity_edges=output_path / f"app_similarity_edges_{safe_season}.{suffix}",
+        app_feature_metadata=output_path / f"app_feature_metadata_{safe_season}.{suffix}",
     )
 
 
@@ -218,6 +229,9 @@ def export_player_season_tables(
     _write_frame(archetype_scores, paths.archetype_scores)
     _write_frame(archetype_explanations, paths.archetype_explanations)
     _write_frame(player_summary, paths.player_summary)
+    _write_frame(build_app_player_profiles(features, player_summary), paths.app_player_profiles)
+    _write_frame(build_app_similarity_edges(neighbors), paths.app_similarity_edges)
+    _write_frame(build_app_feature_metadata(), paths.app_feature_metadata)
     return paths
 
 

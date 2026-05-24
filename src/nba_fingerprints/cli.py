@@ -49,6 +49,9 @@ def main() -> None:
         print(f"archetype_scores: {paths.archetype_scores}")
         print(f"archetype_explanations: {paths.archetype_explanations}")
         print(f"player_summary: {paths.player_summary}")
+        print(f"app_player_profiles: {paths.app_player_profiles}")
+        print(f"app_similarity_edges: {paths.app_similarity_edges}")
+        print(f"app_feature_metadata: {paths.app_feature_metadata}")
 
 
 if __name__ == "__main__":

@@ -67,6 +67,13 @@ SCORING_STYLE_FEATURE_COLUMNS = [
     *TRACKING_FEATURE_COLUMNS,
 ]
 
+SCORING_STYLE_AVAILABILITY_COLUMNS = [
+    "has_synergy_data",
+    "has_shot_location_data",
+    "has_tracking_shot_data",
+    "has_touch_tracking_data",
+]
+
 
 def attach_scoring_style_features(
     player_features: pd.DataFrame,
@@ -81,10 +88,14 @@ def attach_scoring_style_features(
         shot_locations=shot_locations,
         tracking_frames=tracking_frames,
     )
-    passthrough = player_features.drop(columns=SCORING_STYLE_FEATURE_COLUMNS, errors="ignore")
-    return passthrough.merge(scoring_features, on="player_id", how="left").fillna(
-        {column: 0.0 for column in SCORING_STYLE_FEATURE_COLUMNS}
+    passthrough = player_features.drop(
+        columns=[*SCORING_STYLE_FEATURE_COLUMNS, *SCORING_STYLE_AVAILABILITY_COLUMNS],
+        errors="ignore",
     )
+    merged = passthrough.merge(scoring_features, on="player_id", how="left")
+    fill_values = {column: 0.0 for column in SCORING_STYLE_FEATURE_COLUMNS}
+    fill_values.update({column: False for column in SCORING_STYLE_AVAILABILITY_COLUMNS})
+    return merged.fillna(fill_values)
 
 
 def build_scoring_style_features(
@@ -98,15 +109,42 @@ def build_scoring_style_features(
     output = pd.DataFrame({"player_id": pd.to_numeric(player_features["player_id"], errors="coerce").astype("Int64")})
     for column in SCORING_STYLE_FEATURE_COLUMNS:
         output[column] = 0.0
+    for column in SCORING_STYLE_AVAILABILITY_COLUMNS:
+        output[column] = False
 
     if synergy_frames:
         output = _merge_feature_block(output, _build_synergy_features(synergy_frames))
+        output["has_synergy_data"] = output["has_synergy_data"] | output["player_id"].isin(
+            _source_player_ids(synergy_frames.values())
+        )
     if shot_locations is not None:
         output = _merge_feature_block(output, _build_shot_location_features(shot_locations))
+        output["has_shot_location_data"] = output["has_shot_location_data"] | output["player_id"].isin(
+            _source_player_ids([shot_locations])
+        )
     if tracking_frames:
         output = _merge_feature_block(output, _build_tracking_features(player_features, tracking_frames))
+        output["has_tracking_shot_data"] = output["has_tracking_shot_data"] | output["player_id"].isin(
+            _source_player_ids(
+                frame
+                for measure_type, frame in tracking_frames.items()
+                if _normalize_key(measure_type) in {"catch_shoot", "pull_up", "pull_up_shot"}
+            )
+        )
+        output["has_touch_tracking_data"] = output["has_touch_tracking_data"] | output["player_id"].isin(
+            _source_player_ids(
+                frame
+                for measure_type, frame in tracking_frames.items()
+                if _normalize_key(measure_type)
+                in {"drives", "passing", "possessions", "paint_touches", "post_touches", "elbow_touches"}
+            )
+        )
 
-    return output.loc[:, ["player_id", *SCORING_STYLE_FEATURE_COLUMNS]].fillna(0.0)
+    fill_values = {column: 0.0 for column in SCORING_STYLE_FEATURE_COLUMNS}
+    fill_values.update({column: False for column in SCORING_STYLE_AVAILABILITY_COLUMNS})
+    return output.loc[:, ["player_id", *SCORING_STYLE_FEATURE_COLUMNS, *SCORING_STYLE_AVAILABILITY_COLUMNS]].fillna(
+        fill_values
+    )
 
 
 def _build_synergy_features(synergy_frames: Mapping[str, pd.DataFrame]) -> pd.DataFrame:
@@ -301,6 +339,20 @@ def _aggregate_player_rows(frame: pd.DataFrame) -> pd.DataFrame:
     ]
     aggregated = frame.groupby("player_id", as_index=False)[numeric_columns].mean()
     return aggregated
+
+
+def _source_player_ids(frames: object) -> set[int]:
+    player_ids: set[int] = set()
+    for frame in frames:
+        if frame is None or frame.empty:
+            continue
+        current = _flatten_columns(frame)
+        player_id_column = "PLAYER_ID" if "PLAYER_ID" in current.columns else "player_id"
+        if player_id_column not in current.columns:
+            continue
+        ids = pd.to_numeric(current[player_id_column], errors="coerce").dropna().astype(int)
+        player_ids.update(ids.tolist())
+    return player_ids
 
 
 def _flatten_columns(frame: pd.DataFrame) -> pd.DataFrame:

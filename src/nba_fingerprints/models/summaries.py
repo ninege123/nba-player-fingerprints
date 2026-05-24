@@ -17,7 +17,17 @@ def build_player_summary_table(
     """Build one compact row per player-season for manual review and reporting."""
     validate_columns(
         features,
-        ["season", "player_id", "player_name", "team_abbreviation", "position", "minutes_total", "games_played"],
+        [
+            "season",
+            "player_id",
+            "player_name",
+            "team_abbreviation",
+            "position",
+            "minutes_total",
+            "games_played",
+            "points_per_36",
+            "true_shooting_pct",
+        ],
         dataset_name="player features",
     )
     validate_columns(
@@ -53,7 +63,9 @@ def build_player_summary_table(
             "games_played",
             "minutes_total",
             "minutes_per_game",
+            "points_per_36",
             "usage_rate",
+            "true_shooting_pct",
             "player_impact_estimate",
         ],
     ].copy()

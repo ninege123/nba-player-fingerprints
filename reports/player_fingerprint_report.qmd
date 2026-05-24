@@ -67,6 +67,83 @@ Reference profiles are built in two ways. Broad position references use NBA-list
 
 The default export uses a 500-minute threshold. This reduces noise from low-minute players whose rate statistics can swing heavily in small samples.
 
+## Scoring Style Coverage
+
+Optional scoring-style sources are tracked separately from the feature values. This prevents a missing source from being interpreted as a true zero tendency.
+
+```{r}
+availability_columns <- c(
+  "has_synergy_data",
+  "has_shot_location_data",
+  "has_tracking_shot_data",
+  "has_touch_tracking_data"
+)
+availability_summary <- data.frame(
+  source = availability_columns,
+  players = sapply(outputs$features[availability_columns], function(column) sum(column == "True" | column == TRUE)),
+  total_players = nrow(outputs$features)
+)
+availability_summary$coverage_pct <- round(100 * availability_summary$players / availability_summary$total_players, 1)
+knitr::kable(availability_summary)
+```
+
+## Scoring Style Leaders
+
+The play-type and tracking features describe how players score. Frequency columns capture how often the action appears in the player's profile, while points-per-possession and efficiency columns describe outcomes.
+
+```{r}
+leader_columns <- c(
+  "player_name",
+  "team_abbreviation",
+  "isolation_frequency",
+  "isolation_points_per_possession",
+  "pnr_ball_handler_frequency",
+  "pnr_ball_handler_points_per_possession",
+  "spot_up_frequency",
+  "off_screen_frequency",
+  "catch_shoot_attempt_frequency",
+  "pull_up_attempt_frequency"
+)
+
+scoring_style_preview <- outputs$features[
+  order(-outputs$features$pnr_ball_handler_frequency),
+  leader_columns
+]
+knitr::kable(head(scoring_style_preview, 15))
+```
+
+```{r}
+iso_leaders <- outputs$features[
+  outputs$features$isolation_frequency >= 0.08,
+  c("player_name", "team_abbreviation", "isolation_frequency", "isolation_points_per_possession", "isolation_percentile")
+]
+iso_leaders <- iso_leaders[order(-iso_leaders$isolation_points_per_possession), ]
+knitr::kable(head(iso_leaders, 15))
+```
+
+```{r}
+old_mar <- par("mar")
+par(mar = c(5, 5, 3, 1))
+plot(
+  outputs$features$catch_shoot_attempt_frequency,
+  outputs$features$pull_up_attempt_frequency,
+  xlab = "Catch-and-shoot attempt frequency",
+  ylab = "Pull-up attempt frequency",
+  main = "Catch-and-shoot vs pull-up profile",
+  pch = 19,
+  col = "#4C78A8"
+)
+featured_shooters <- outputs$features$player_name %in% c("Stephen Curry", "Luka Doncic", "Shai Gilgeous-Alexander", "Kevin Durant")
+text(
+  outputs$features$catch_shoot_attempt_frequency[featured_shooters],
+  outputs$features$pull_up_attempt_frequency[featured_shooters],
+  labels = outputs$features$player_name[featured_shooters],
+  pos = 4,
+  cex = 0.75
+)
+par(mar = old_mar)
+```
+
 ## Player Summary
 
 The player summary table combines each player's top neighbor, top broad position reference, top archetype, and top-match explanation into one row.
