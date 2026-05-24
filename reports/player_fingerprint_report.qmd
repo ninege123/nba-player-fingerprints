@@ -20,7 +20,7 @@ outputs <- load_player_fingerprint_outputs(season = season, processed_dir = "../
 
 ## Overview
 
-This report summarizes the first player-season fingerprint pipeline. The current version uses public NBA box-score totals and advanced stats, builds normalized player fingerprints, and compares those fingerprints to other players, broad listed positions, and manually defined playing-style archetypes.
+This report summarizes the first player-season fingerprint pipeline. The current version uses public NBA box-score totals and advanced stats, with optional shot-location, tracking, and play-type inputs for richer scoring-style fingerprints. It builds normalized player fingerprints and compares those fingerprints to other players, broad listed positions, and manually defined playing-style archetypes.
 
 ```{r}
 summary_table <- data.frame(
@@ -57,13 +57,13 @@ knitr::kable(summary_table)
 
 ## Methodology
 
-The unit of analysis is one NBA player-season. Raw counting stats are converted into rate-based and context-aware features so the comparison is not driven only by minutes played. The current fingerprint includes per-36 production, shooting mix, efficiency, usage rate, assist percentage, rebound percentages, pace, net rating, and player impact estimate.
+The unit of analysis is one NBA player-season. Raw counting stats are converted into rate-based and context-aware features so the comparison is not driven only by minutes played. The current fingerprint includes per-36 production, shooting mix, efficiency, usage rate, assist percentage, rebound percentages, pace, net rating, player impact estimate, and optional scoring-style dimensions such as isolation, pick-and-roll, spot-up, cut, shot-location, catch-and-shoot, pull-up, drive, and touch indicators.
 
 Before similarity scoring, each fingerprint feature is min-max scaled to a 0-to-1 range within the comparison set. This puts different basketball measurements on a common scale, allowing the model to compare profile shape rather than raw units. The tradeoff is that min-max scaling can be sensitive to extreme values, so robust scaling and percentile ranks are natural future checks.
 
 Cosine similarity is used as the main resemblance metric. In this context, cosine similarity measures whether two normalized statistical profiles point in a similar direction. It should be read as stylistic resemblance, not as a player quality grade, causal claim, or projection model.
 
-Reference profiles are built in two ways. Broad position references use NBA-listed `G`, `F`, and `C` labels as loose anchors. Archetype references use transparent manual weights over basketball features, which makes labels such as `high_usage_creator`, `three_and_d_wing`, and `rim_running_center` easier to inspect and explain.
+Reference profiles are built in two ways. Broad position references use NBA-listed `G`, `F`, and `C` labels as loose anchors. Archetype references use transparent manual weights over basketball features, which makes labels such as `high_usage_creator`, `three_and_d_wing`, `rim_running_center`, `isolation_creator`, and `pick_and_roll_creator` easier to inspect and explain.
 
 The default export uses a 500-minute threshold. This reduces noise from low-minute players whose rate statistics can swing heavily in small samples.
 
@@ -156,10 +156,10 @@ knitr::kable(position_summary)
 
 This MVP is designed to be explainable and reproducible, but it still has important limitations.
 
-- The current data comes from public box-score and advanced-stat endpoints. It does not yet include play-type tracking such as isolation, pick-and-roll, handoff, catch-and-shoot, or rim-running possessions.
+- The default cached export still works with box-score and advanced-stat endpoints only. Scoring-style columns are supported, but they require optional NBA Stats shot-location, tracking, and play-type pulls or cached source files.
 - NBA-listed position metadata is broad. The public endpoint provides labels such as `G`, `F`, and `C`, not a clean `PG/SG/SF/PF/C` role taxonomy.
 - Archetype references are manually weighted in this version. That makes them transparent, but the weights should be tested against clustering, sensitivity checks, and basketball review.
 - Cosine similarity measures statistical profile resemblance. It does not account for role constraints, team scheme, defensive matchup context, injuries, playoff usage, or lineup effects.
 - The 500-minute threshold improves stability but excludes lower-minute players who may still be analytically interesting.
 
-Future versions should add hybrid labels, outlier flags, season-over-season stability metrics, clustering comparisons, and richer play-type data if a stable public source is available.
+Future versions should add hybrid labels, outlier flags, season-over-season stability metrics, clustering comparisons, and endpoint reliability checks for the optional scoring-style sources.

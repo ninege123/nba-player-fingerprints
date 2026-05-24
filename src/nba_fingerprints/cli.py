@@ -19,6 +19,12 @@ def main() -> None:
     export_parser.add_argument("--raw-cache-dir", default="data/raw", help="Directory for raw API cache files")
     export_parser.add_argument("--file-format", choices=["csv", "parquet"], default="csv", help="Output and cache file format")
     export_parser.add_argument("--refresh-cache", action="store_true", help="Fetch from the API even if raw cache exists")
+    export_parser.add_argument("--include-scoring-style", action="store_true", help="Include optional shot, tracking, and play-type features")
+    export_parser.add_argument(
+        "--fail-on-scoring-style-error",
+        action="store_true",
+        help="Fail the export if an optional scoring-style endpoint is unavailable",
+    )
 
     args = parser.parse_args()
 
@@ -31,6 +37,8 @@ def main() -> None:
             raw_cache_dir=args.raw_cache_dir,
             file_format=args.file_format,
             use_cache=not args.refresh_cache,
+            include_scoring_style=args.include_scoring_style,
+            ignore_scoring_style_errors=not args.fail_on_scoring_style_error,
         )
         print(f"features: {paths.features}")
         print(f"fingerprints: {paths.fingerprints}")

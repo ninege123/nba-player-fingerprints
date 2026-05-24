@@ -7,7 +7,15 @@ from pathlib import Path
 
 import pandas as pd
 
-from nba_fingerprints.data.nba_api_client import load_player_index, load_player_season_stats
+from nba_fingerprints.data.nba_api_client import (
+    SYNERGY_PLAY_TYPES,
+    TRACKING_MEASURE_TYPES,
+    load_player_index,
+    load_player_season_stats,
+    load_player_shot_locations,
+    load_player_synergy_play_type,
+    load_player_tracking_stats,
+)
 from nba_fingerprints.features.archetypes import (
     build_archetype_references,
     explain_top_archetype_matches,
@@ -16,6 +24,7 @@ from nba_fingerprints.features.archetypes import (
 from nba_fingerprints.features.fingerprints import build_fingerprint_table
 from nba_fingerprints.features.player_season import build_player_season_features
 from nba_fingerprints.features.positions import attach_position_labels, build_position_references, score_position_similarity
+from nba_fingerprints.features.scoring_style import attach_scoring_style_features
 from nba_fingerprints.models.neighbors import find_nearest_neighbors
 from nba_fingerprints.models.summaries import build_player_summary_table
 
@@ -68,6 +77,9 @@ def build_player_season_export_tables(
     season: str,
     advanced_stats: pd.DataFrame | None = None,
     player_index: pd.DataFrame | None = None,
+    synergy_frames: dict[str, pd.DataFrame] | None = None,
+    shot_locations: pd.DataFrame | None = None,
+    tracking_frames: dict[str, pd.DataFrame] | None = None,
     min_minutes: float = 500.0,
     top_n: int = 5,
 ) -> tuple[
@@ -90,6 +102,12 @@ def build_player_season_export_tables(
     )
     if player_index is not None:
         features = attach_position_labels(features, player_index)
+    features = attach_scoring_style_features(
+        features,
+        synergy_frames=synergy_frames,
+        shot_locations=shot_locations,
+        tracking_frames=tracking_frames,
+    )
 
     id_columns = ["season", "player_id", "player_name", "team_abbreviation"]
     if "position" in features.columns and "primary_position" in features.columns:
@@ -134,6 +152,8 @@ def export_player_season_tables(
     raw_cache_dir: Path | str = "data/raw",
     file_format: str = "csv",
     use_cache: bool = True,
+    include_scoring_style: bool = False,
+    ignore_scoring_style_errors: bool = True,
 ) -> PlayerSeasonExportPaths:
     """Load raw stats, build processed tables, and write them to disk."""
     raw_stats = load_player_season_stats(
@@ -155,6 +175,17 @@ def export_player_season_tables(
         use_cache=use_cache,
         file_format=file_format,
     )
+    synergy_frames: dict[str, pd.DataFrame] | None = None
+    shot_locations: pd.DataFrame | None = None
+    tracking_frames: dict[str, pd.DataFrame] | None = None
+    if include_scoring_style:
+        synergy_frames, shot_locations, tracking_frames = _load_scoring_style_sources(
+            season=season,
+            raw_cache_dir=raw_cache_dir,
+            file_format=file_format,
+            use_cache=use_cache,
+            ignore_errors=ignore_scoring_style_errors,
+        )
     (
         features,
         fingerprints,
@@ -170,6 +201,9 @@ def export_player_season_tables(
         season=season,
         advanced_stats=advanced_stats,
         player_index=player_index,
+        synergy_frames=synergy_frames,
+        shot_locations=shot_locations,
+        tracking_frames=tracking_frames,
         min_minutes=min_minutes,
         top_n=top_n,
     )
@@ -185,6 +219,63 @@ def export_player_season_tables(
     _write_frame(archetype_explanations, paths.archetype_explanations)
     _write_frame(player_summary, paths.player_summary)
     return paths
+
+
+def _load_scoring_style_sources(
+    season: str,
+    raw_cache_dir: Path | str,
+    file_format: str,
+    use_cache: bool,
+    ignore_errors: bool,
+) -> tuple[dict[str, pd.DataFrame], pd.DataFrame | None, dict[str, pd.DataFrame]]:
+    synergy_frames: dict[str, pd.DataFrame] = {}
+    tracking_frames: dict[str, pd.DataFrame] = {}
+
+    for play_type in SYNERGY_PLAY_TYPES:
+        frame = _load_optional_source(
+            load_player_synergy_play_type,
+            ignore_errors=ignore_errors,
+            season=season,
+            play_type=play_type,
+            cache_dir=raw_cache_dir,
+            use_cache=use_cache,
+            file_format=file_format,
+        )
+        if frame is not None:
+            synergy_frames[play_type] = frame
+
+    shot_locations = _load_optional_source(
+        load_player_shot_locations,
+        ignore_errors=ignore_errors,
+        season=season,
+        cache_dir=raw_cache_dir,
+        use_cache=use_cache,
+        file_format=file_format,
+    )
+
+    for measure_type in TRACKING_MEASURE_TYPES:
+        frame = _load_optional_source(
+            load_player_tracking_stats,
+            ignore_errors=ignore_errors,
+            season=season,
+            measure_type=measure_type,
+            cache_dir=raw_cache_dir,
+            use_cache=use_cache,
+            file_format=file_format,
+        )
+        if frame is not None:
+            tracking_frames[measure_type] = frame
+
+    return synergy_frames, shot_locations, tracking_frames
+
+
+def _load_optional_source(loader, ignore_errors: bool, **kwargs) -> pd.DataFrame | None:
+    try:
+        return loader(**kwargs)
+    except Exception:
+        if ignore_errors:
+            return None
+        raise
 
 
 def _write_frame(frame: pd.DataFrame, path: Path) -> None:

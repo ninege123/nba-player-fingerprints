@@ -1,6 +1,6 @@
 # NBA Player Fingerprints
 
-This project builds player-season fingerprints for NBA players using public basketball data. A fingerprint is a normalized feature vector that describes a player's role, position tendencies, and style of play using box-score and advanced-stat indicators.
+This project builds player-season fingerprints for NBA players using public basketball data. A fingerprint is a normalized feature vector that describes a player's role, position tendencies, and style of play using box-score, advanced-stat, shot-location, tracking, and play-type indicators.
 
 The goal is to compare players to position references, style archetypes, and other players using similarity analysis, outlier detection, and explainable visualizations.
 
@@ -35,6 +35,7 @@ Raw counting stats are transformed into rate-based features so players with diff
 - role and creation: usage rate, assist percentage, assist-to-turnover ratio
 - rebounding profile: offensive, defensive, and total rebound percentages
 - context and impact: pace, net rating, player impact estimate
+- optional scoring style: isolation, pick-and-roll, spot-up, cut, handoff, post-up, off-screen, putback, transition, shot-location, catch-and-shoot, pull-up, drive, and touch indicators
 
 This avoids comparing players only by raw totals, which would mostly measure playing time and team context.
 
@@ -61,7 +62,7 @@ Cosine similarity is not treated as a causal metric or a player quality score. I
 Reference fingerprints are built in two ways:
 
 - listed-position references: average fingerprints for NBA-listed broad positions such as `G`, `F`, and `C`
-- manual archetype references: transparent weighted profiles for basketball roles such as `floor_general`, `scoring_guard`, `three_and_d_wing`, `stretch_big`, and `rim_running_center`
+- manual archetype references: transparent weighted profiles for basketball roles such as `floor_general`, `scoring_guard`, `three_and_d_wing`, `stretch_big`, `rim_running_center`, `isolation_creator`, `pick_and_roll_creator`, `movement_shooter`, and `post_scorer`
 
 Position labels are used as loose anchors rather than ground truth. NBA public metadata is broad and imperfect, so the archetype layer is where the project expresses richer basketball role language.
 
@@ -139,6 +140,12 @@ Export processed CSVs for manual inspection:
 
 ```powershell
 $env:PYTHONPATH="src"; .\.venv\Scripts\python.exe -m nba_fingerprints.cli export-player-season --season 2023-24 --min-minutes 500 --top-n 5
+```
+
+Add optional scoring-style sources when cached or available from NBA Stats:
+
+```powershell
+$env:PYTHONPATH="src"; .\.venv\Scripts\python.exe -m nba_fingerprints.cli export-player-season --season 2023-24 --min-minutes 500 --top-n 5 --include-scoring-style
 ```
 
 This writes:

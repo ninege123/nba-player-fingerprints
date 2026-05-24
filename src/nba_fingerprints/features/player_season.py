@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from nba_fingerprints.features.scoring_style import SCORING_STYLE_FEATURE_COLUMNS
 from nba_fingerprints.features.schema import validate_columns
 
 
@@ -72,6 +73,7 @@ FINGERPRINT_FEATURE_COLUMNS = [
     "pace",
     "player_impact_estimate",
     "net_rating",
+    *SCORING_STYLE_FEATURE_COLUMNS,
 ]
 
 
@@ -106,6 +108,7 @@ def build_player_season_features(
             "age": frame["AGE"],
             "games_played": frame["GP"],
             "minutes_total": frame["MIN"],
+            "field_goal_attempts": frame["FGA"],
             "minutes_per_game": _safe_divide(frame["MIN"], frame["GP"]),
             "points_per_36": _per_36(frame["PTS"], frame["MIN"]),
             "assists_per_36": _per_36(frame["AST"], frame["MIN"]),
@@ -132,6 +135,8 @@ def build_player_season_features(
             "net_rating": _advanced_or_zero(frame, "NET_RATING"),
         }
     )
+    for column in SCORING_STYLE_FEATURE_COLUMNS:
+        features[column] = 0.0
 
     return features.reset_index(drop=True)
 

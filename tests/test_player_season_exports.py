@@ -94,10 +94,33 @@ class PlayerSeasonExportTests(unittest.TestCase):
         self.assertEqual(neighbors.shape[0], 6)
         self.assertEqual(position_references.shape[0], 2)
         self.assertEqual(position_scores.shape[0], 6)
-        self.assertEqual(archetype_references.shape[0], 8)
-        self.assertEqual(archetype_scores.shape[0], 24)
+        self.assertEqual(archetype_references.shape[0], 16)
+        self.assertEqual(archetype_scores.shape[0], 48)
         self.assertEqual(archetype_explanations.shape[0], 3)
         self.assertEqual(player_summary.shape[0], 3)
+
+    def test_build_player_season_export_tables_merges_scoring_style_features(self) -> None:
+        features, *_ = build_player_season_export_tables(
+            self.raw_stats,
+            season="2023-24",
+            advanced_stats=self.advanced_stats,
+            player_index=pd.DataFrame(
+                {
+                    "PERSON_ID": [1, 2, 3],
+                    "TEAM_ID": [100, 200, 300],
+                    "POSITION": ["G", "G", "C"],
+                }
+            ),
+            synergy_frames={"isolation": pd.DataFrame({"PLAYER_ID": [1], "POSS_PCT": [0.2], "PPP": [1.1]})},
+            min_minutes=0,
+            top_n=1,
+        )
+
+        creator = features[features["player_id"] == 1].iloc[0]
+        other = features[features["player_id"] == 2].iloc[0]
+        self.assertEqual(creator["isolation_frequency"], 0.2)
+        self.assertEqual(creator["isolation_points_per_possession"], 1.1)
+        self.assertEqual(other["isolation_frequency"], 0.0)
 
     def test_export_player_season_tables_writes_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

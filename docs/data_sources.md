@@ -9,12 +9,15 @@
 - Player season traditional stats from `LeagueDashPlayerStats` with `measure_type="Base"` and `per_mode="Totals"`.
 - Player season advanced stats from the same endpoint with `measure_type="Advanced"`, including usage, assist, rebound, pace, impact, and rating context.
 - Player index metadata from `PlayerIndex` for NBA-listed broad position labels.
+- Offensive play-type summaries from `SynergyPlayTypes` for isolation, pick-and-roll, spot-up, cut, handoff, post-up, off-screen, putback, and transition scoring.
+- Player shot-location summaries from `LeagueDashPlayerShotLocations` for rim, paint, mid-range, corner-three, and above-break-three shot mix.
+- Player tracking shot summaries from `LeagueDashPtStats` and `LeagueDashPlayerPtShot` for catch-and-shoot, pull-up, defender-distance, dribble-range, touch-time, and shot-clock context.
+- Player tracking touch summaries from `LeagueDashPtStats` for drives, touches, paint touches, elbow touches, post touches, and passing context.
 
 ## Later sources
 
-- Play type data if a stable public source is available.
-- Shot chart or location data for richer shooting fingerprints.
-- Tracking-derived style features if available.
+- Possession-level shot chart data from `ShotChartDetail` if shot-location summaries are not detailed enough.
+- Defensive matchup and contest tracking if endpoint availability is stable enough for reproducible exports.
 
 ## Storage rules
 
